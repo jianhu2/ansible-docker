@@ -1,0 +1,5 @@
+./idea
+/web/package-lock.json
+/web/node_modules/
+*.log
+ansible/*.tar.gz

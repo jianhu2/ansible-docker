@@ -1,0 +1,6 @@
+- hosts: dev
+  gather_facts: true
+  vars:
+    GOLANG_TGZ: ""
+  roles:
+    - init_system

@@ -1,0 +1,1 @@
+DOCKER_COMPOSE_BIN: "https://github.com/docker/compose/releases/download/v2.33.1/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"

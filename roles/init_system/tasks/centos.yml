@@ -1,0 +1,22 @@
+- name: 更新yum
+  yum:
+    update_only: yes
+- name: 安装htop/net-tools
+  yum:
+    name:
+      - yum-utils
+      - net-tools
+      - nc
+    state: present
+- name: Install epel-release
+  when:
+    - ansible_facts["distribution"] == "CentOS"
+    - ansible_facts["distribution_major_version"] == "7"
+  yum:
+    name:
+      - epel-release
+- name: 安装python3
+  yum:
+    name:
+      - python3
+    state: present

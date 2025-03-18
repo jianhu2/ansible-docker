@@ -1,0 +1,26 @@
+- include_tasks: docker_centos.yml
+  when: ansible_facts["distribution"] == "CentOS"
+- include_tasks: docker_ubuntu.yml
+  when: ansible_facts["distribution"] == "Ubuntu"
+- name: 创建目录/etc/docker/
+  file:
+    path: /etc/docker/
+    state: directory
+    mode: '0755'
+- name: 拷贝docker配置daemon.json
+  copy:
+    src: "files/daemon.json"
+    dest: "/etc/docker/daemon.json"
+# 目前的docker安装方式，还没见哪个/usr/lib/systemd/system/docker.service会用到OPTIONS
+# RatHat的文档https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/getting_started_with_containers/using_the_docker_command_and_service#default_options
+# 里有用到，可能是RatHat官方的docker yum库使用，但这里用的是docker官方的yum库
+- name: 取消journald作为Docker日志引擎
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/docker
+    regexp: '--log-driver=journald'
+    state: absent
+- name: 启动Docker守护进程并让它关机重启也生效
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker

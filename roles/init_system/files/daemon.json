@@ -1,0 +1,12 @@
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "512m",
+    "max-file": "3"
+  },
+  "registry-mirrors": [
+    "https://docker-0.unsee.tech",
+    "https://docker-cf.registry.cyou",
+    "https://docker.1panel.live"
+  ]
+}

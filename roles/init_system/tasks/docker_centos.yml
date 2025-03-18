@@ -1,0 +1,32 @@
+- name: 配置文件禁用SELinux
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=enforcing'
+    line: SELINUX=disabled
+- name: 立即禁用SELinux
+  shell: setenforce 0 || echo "1"
+- name: 添加docker-ce的yum仓库
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: 安装docker
+  yum:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+- name: 安装docker-compose包
+  when:
+    - ansible_facts["distribution"] == "CentOS"
+    - ansible_facts["distribution_major_version"] == "7"
+  yum:
+    name:
+      - docker-compose
+    state: present
+- name: 二进制安装docker-compose
+  when:
+    - ansible_facts["distribution"] == "CentOS"
+    - ansible_facts["distribution_major_version"] == "8"
+  get_url:
+    url: "{{ DOCKER_COMPOSE_BIN }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0555'

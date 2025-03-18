@@ -1,0 +1,64 @@
+- name: 检查 SELinux 配置文件是否存在
+  ansible.builtin.stat:
+    path: /etc/selinux/config
+  register: selinux_config
+- name: 配置文件禁用SELinux
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=enforcing'
+    line: "SELINUX=disabled"
+  when: selinux_config.stat.exists
+- name: 立即禁用SELinux
+  shell: setenforce 0 || echo "1"
+  when: selinux_config.stat.exists
+- name: 安装一些依赖包
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+- name: 添加Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+- name: 添加Docker APT仓库
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+
+- name: 安装docker及containerd
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - containerd.io
+    - docker-ce-cli
+    - docker-ce
+- name: 二进制安装docker-compose
+  get_url:
+    url: "{{ DOCKER_COMPOSE_BIN }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0555'
+
+- name: 验证docker版本
+  shell: docker --version
+  register: docker_version_output
+  changed_when: false
+
+- name: 验证docker-compose版本
+  shell: docker-compose --version
+  register: docker_compose_version_output
+  changed_when: false
+
+- name: Docker version
+  debug:
+    var: docker_version_output.stdout
+
+- name: Docker-Compose version
+  debug:
+    var: docker_compose_version_output.stdout

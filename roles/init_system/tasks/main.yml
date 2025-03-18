@@ -1,0 +1,6 @@
+- include_tasks: golang.yml
+  when:  GOLANG_TGZ is defined and GOLANG_TGZ != ""
+- include_tasks: centos.yml
+  when: ansible_facts["distribution"] == "CentOS"
+- include_tasks: docker.yml
+
