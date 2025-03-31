@@ -28,7 +28,7 @@
     state: present
 - name: 添加Docker APT仓库
   apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+    repo: deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu {{ansible_distribution_release}} stable
 
 - name: 安装docker及containerd
   apt:
