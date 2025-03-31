@@ -24,7 +24,7 @@
     - software-properties-common
 - name: 添加Docker GPG key
   apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
+    url: https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg
     state: present
 - name: 添加Docker APT仓库
   apt_repository:
