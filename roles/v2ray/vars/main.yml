@@ -1,0 +1,15 @@
+# 基础配置
+v2ray_version: "v5.30.0"
+v2ray_port: 10086
+v2ray_protocol: "vmess"  # vmess/vless/trojan
+uuid: "d4246bfc-df63-4ddf-870f-acf2235d2189"
+enable_tls: true
+enable_ws: true
+domain: "p-test.hujian.xyz"
+cert_path: "/etc/v2ray"
+
+nginx_port: 443
+# 功能开关
+ws_path: "/ray"
+allow_spider: "n"
+download_remote: false  # 当为true从目标服务器下载v2ray

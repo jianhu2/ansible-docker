@@ -1,0 +1,35 @@
+- name: Generate V2Ray config
+  template:
+    src: "config.json.j2"
+    dest: "/etc/v2ray/config.json"
+
+- name: Generate V2Ray server
+  template:
+    src: "v2ray.service"
+    dest: "/etc/systemd/system/v2ray.service"
+  notify: restart v2ray
+
+- name: Generate Nginx config
+  template:
+    src: "nginx.conf"
+    dest: "/etc/nginx/conf.d/{{ domain }}.conf"
+  when: enable_tls
+  notify: reload nginx
+
+- name: Ensure services are enabled
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  loop:
+    - v2ray
+    - nginx
+
+- name: 检查并确保 Nginx 正在运行
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  register: nginx_status
+  failed_when: nginx_status.failed and "'nginx.service' not found" not in nginx_status.msg
+  changed_when: nginx_status.changed

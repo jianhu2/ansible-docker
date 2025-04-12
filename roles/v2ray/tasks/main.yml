@@ -1,0 +1,4 @@
+- include_tasks: init_configure.yml
+- include_tasks: install.yml
+- include_tasks: certbot.yml
+- include_tasks: init_server.yml

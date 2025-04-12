@@ -1,0 +1,10 @@
+- name: 拷贝自动签名TLS服务
+  copy:
+    src: "files/cert.service"
+    dest: "/etc/systemd/system/cert-v2ray.service"
+
+- name: 启动cert守护进程并让它关机重启也生效
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: cert-v2ray

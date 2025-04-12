@@ -1,0 +1,46 @@
+{
+	"log": {
+    "loglevel": "debug"
+	},
+  "inbounds": [{
+    "port": {{ v2ray_port }},
+    "listen": "127.0.0.1",
+    "protocol": "{{ v2ray_protocol }}",
+    "settings": {
+      "clients": [
+        {
+          "id": "{{ uuid }}",,
+          "level": 1,
+          "alterId": 0
+        }
+      ],
+      "disableInsecureEncryption": false
+    },
+    "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+             "path": "{{ ws_path }}",
+            "headers": {
+                "Host":  "{{ domain }}"
+            }
+        }
+    }
+  }],
+  "outbounds": [{
+    "protocol": "freedom",
+    "settings": {}
+  },{
+    "protocol": "blackhole",
+    "settings": {},
+    "tag": "blocked"
+  }],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": ["geoip:private"],
+        "outboundTag": "blocked"
+      }
+    ]
+  }
+}

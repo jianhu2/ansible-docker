@@ -1,0 +1,7 @@
+- hosts: pro
+  become: yes
+  gather_facts: true
+  vars_files:
+    - roles/v2ray/vars/main.yml
+  roles:
+    - v2ray
