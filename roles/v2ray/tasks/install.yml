@@ -30,32 +30,16 @@
     state: present
   tags: [deps]  # 注意缩进，tags应该与name同级
 
-- name: 创建临时目录
+- name: 创建指定目录
   ansible.builtin.file:
-    path: /tmp/v2ray_temp
+    path: /usr/local/bin/v2ray
     state: directory
     mode: '0755'
 
-- name: 解压到临时目录
+- name: 解压到指定目录
   ansible.builtin.unarchive:
     src: /tmp/v2ray.zip
-    dest: /tmp/v2ray_temp
+    dest: /usr/local/bin/v2ray
     remote_src: yes
 
-- name: 移动v2ray可执行文件
-  ansible.builtin.copy:
-    src: "/tmp/v2ray_temp/v2ray"
-    dest: "/usr/local/bin/v2ray"
-    remote_src: yes
-    mode: "0755"
-
-- name: 清理临时文件1
-  ansible.builtin.file:
-    path: /tmp/v2ray.zip
-    state: absent
-
-- name: 清理临时文件2
-  ansible.builtin.file:
-    path: /tmp/v2ray_temp
-    state: absent
 
