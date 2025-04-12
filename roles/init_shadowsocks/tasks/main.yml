@@ -1,0 +1,3 @@
+- include_tasks: init_system_command.yml
+- include_tasks: install_shadowsocks.yml
+- include_tasks: install_cert-auto.yml

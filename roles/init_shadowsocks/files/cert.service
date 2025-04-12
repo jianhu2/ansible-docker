@@ -1,0 +1,15 @@
+[Unit]
+Description=cert auto Service
+Documentation=
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/ss-server
+Restart=on-failure
+RestartSec=1200s
+ExecStart=/usr/local/bin/cert-auto -dockerComposePath=/root/ss-server -certPath=/root/ss-server/tls/tls  -domain=127.0.0.1:1443
+
+[Install]
+WantedBy=multi-user.target

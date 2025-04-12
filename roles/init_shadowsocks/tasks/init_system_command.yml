@@ -1,0 +1,23 @@
+- name: 初始化安装一些依赖包
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - lego
+    - git
+    - openssl
+    - ca-certificates
+
+- name: 删除http.sslBackend配置
+  ansible.builtin.git_config:
+    name: http.sslBackend
+    state: absent  # 强制删除配置项
+    scope: global  # 全局生效
+
+- name: 设置postBuffer为500MB
+  ansible.builtin.git_config:
+    name: http.postBuffer
+    value: "524288000"  # 必须字符串格式
+    state: present
+    scope: global

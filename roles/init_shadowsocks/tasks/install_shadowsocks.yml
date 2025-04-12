@@ -1,0 +1,17 @@
+- name: 下载 shadowsocks 服务
+  ansible.builtin.git:
+    repo: "https://{{ github_pat }}@github.com/jianhu2/ss-docker.git"  # 直接在 URL 中嵌入 PAT
+    dest: "{{ DOCKER_INSTALL_PATH }}"
+    version: "server-ubuntu"  # 分支名
+    accept_hostkey: yes
+    clone: yes
+    update: yes
+    force: yes
+- name: 启动docker容器
+  ansible.builtin.shell: docker-compose up -d
+  args:
+    chdir: "{{ DOCKER_INSTALL_PATH }}"
+
+- name: 删除.git配置文件
+  ansible.builtin.command:
+    cmd: "rm -rf {{ DOCKER_INSTALL_PATH }}/.git"

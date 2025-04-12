@@ -1,0 +1,17 @@
+- name: 拷贝cert二进制
+  ansible.builtin.copy:
+    src: "{{ DOCKER_INSTALL_PATH }}/tls/cert-auto"
+    dest: "/usr/local/bin/cert-auto"
+    remote_src: yes
+    mode: '0755'
+
+- name: 拷贝自动签名TLS服务
+  copy:
+    src: "files/cert.service"
+    dest: "/etc/systemd/system/cert.service"
+
+- name: 启动cert守护进程并让它关机重启也生效
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: cert

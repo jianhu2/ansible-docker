@@ -44,8 +44,11 @@ dev: #这个命名在1中被引用
 
 ```ansible-playbook -i ./hosts.yml ./install_docker.yml```
 
+3.运行ansible，会同时安装docker/docker-compose/shadowsocks服务等:
+
+````ansible-playbook -i ./hosts.yml ./install_shadowsocks.yml````
+
 ```shell
-# ansible-playbook -i ./hosts.yml ./install_docker.yml
 
 PLAY [dev] ***************************************************************************************************************************************************************************************************
 

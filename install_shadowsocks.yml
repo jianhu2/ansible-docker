@@ -1,0 +1,7 @@
+- hosts: pro
+  gather_facts: true
+  vars:
+    github_pat: ""
+  roles:
+    - init_system
+    - init_shadowsocks
