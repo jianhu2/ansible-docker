@@ -1,3 +1,17 @@
+- name: 检查V2Ray路径状态
+  ansible.builtin.stat:
+    path: /etc/v2ray
+  register: v2ray_path1
+  ignore_errors: yes
+  changed_when: false
+
+- name: 创建目录
+  ansible.builtin.file:
+    path: /etc/v2ray
+    state: directory
+    mode: '0755'
+  when: not v2ray_path1.stat.exists
+
 - name: move TLS crt
   template:
     src: "tls.crt"
@@ -33,7 +47,7 @@
     - name: 备份V2Ray文件
       ansible.builtin.copy:
         src: /usr/local/bin/v2ray
-        dest: "/tmp/v2ray_backups/v2ray-"
+        dest: "/tmp/v2ray_backups/v2ray"
         remote_src: yes
       when:
         - v2ray_path.stat.exists is defined
@@ -43,7 +57,7 @@
 
     - name: 备份V2Ray目录
       ansible.builtin.command: >
-        tar -zcf "/tmp/v2ray_backups/v2ray-.tar.gz"
+        tar -zcf "/tmp/v2ray_backups/v2ray.tar.gz"
         -C /usr/local/bin v2ray
       when:
         - v2ray_path.stat.exists is defined
@@ -54,7 +68,7 @@
     # 4. 统一验证备份
     - name: 验证备份文件
       ansible.builtin.stat:
-        path: "/tmp/v2ray_backups/v2ray-{{ (v2ray_path.stat.isdir is defined and v2ray_path.stat.isdir) | ternary('.tar.gz','') }}"
+        path: "/tmp/v2ray_backups/v2ray{{ (v2ray_path.stat.isdir is defined and v2ray_path.stat.isdir) | ternary('.tar.gz','') }}"
       register: backup_verify
       when: v2ray_path.stat.exists is defined and v2ray_path.stat.exists
 

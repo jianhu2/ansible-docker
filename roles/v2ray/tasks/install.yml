@@ -17,9 +17,6 @@
     dest: /tmp/v2ray.zip
     timeout: 120
     validate_certs: no
-    checksum: "sha256:https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_version }}/v2ray-linux-64.zip.sha256"
-    # 新增幂等性控制
-    force: no  # 如果文件已存在且校验匹配，则跳过下载
   when: (download_remote|default(true)|bool)
   retries: 3
   delay: 10

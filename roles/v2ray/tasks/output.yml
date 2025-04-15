@@ -1,0 +1,57 @@
+- name: Generate VMess link
+  block:
+    - name: Create raw JSON configuration
+      ansible.builtin.set_fact:
+        vmess_raw_json: |
+          {
+            "v": "2",
+            "ps": "{{ connection_name | default('My V2Ray Server') }}",
+            "add": "{{ INTERNET_IP }}",
+            "port": "{{ nginx_port }}",
+            "id": "{{ uuid }}",
+            "aid": "{{ v2ray_alterid | default('0') }}",
+            "net": "{{ v2ray_network | default('ws') }}",
+            "type": "none",
+            "host": "{{ domain | default('') }}",
+            "path": "{{ ws_path | default('/v2ray') }}",
+            "tls": "{% if v2ray_tls | default(true) %}tls{% else %}none{% endif %}"
+          }
+
+    - name: Detect system type for base64 encoding
+      ansible.builtin.set_fact:
+        base64_command: >-
+          {% if ansible_distribution == 'Ubuntu' %}base64 -w 0
+          {% elif ansible_system == 'Linux' %}base64
+          {% elif ansible_system == 'Darwin' %}base64
+          {% else %}base64{% endif %}
+
+    - name: Generate base64 encoded link
+      ansible.builtin.shell: |
+        echo -n '{{ vmess_raw_json }}' | {{ base64_command }}
+      register: vmess_encoded
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Validate base64 encoding result
+      ansible.builtin.fail:
+        msg: "Failed to generate base64 encoded VMess config. Check if base64 is installed."
+      when: vmess_encoded is not defined or vmess_encoded.stdout is not defined
+
+    - name: Construct final VMess link
+      ansible.builtin.set_fact:
+        vmess_final_link: "vmess://{{ vmess_encoded.stdout }}"
+      when: vmess_encoded.stdout is defined
+
+    - name: Display VMess link with QR code info
+      ansible.builtin.debug:
+        msg: |
+          ========== V2Ray 配置信息 ==========
+          服务器地址: {{ INTERNET_IP }}:{{ nginx_port }}
+          用户ID: {{ uuid }}
+          传输协议: {{ v2ray_network | default('ws') }}路径: {{ ws_path | default('/v2ray') }}
+          TLS: {% if v2ray_tls | default(true) %}启用{% else %}禁用{% endif %}
+          VMess 链接:{{ vmess_final_link | default('生成失败，请检查错误') }}
+          
+          提示: 您可以使用二维码扫描工具导入此配置
+          ===================================
+      when: vmess_final_link is defined

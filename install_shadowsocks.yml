@@ -3,5 +3,5 @@
   vars:
     github_pat: ""
   roles:
-    - init_system
+#    - init_system
     - init_shadowsocks

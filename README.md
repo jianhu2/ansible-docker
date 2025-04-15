@@ -23,7 +23,11 @@ python3 -m pip --version
 pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
 
 ```
-
+或者pip安装
+```
+sudo python3 get-pip.py
+pip install ansible
+```
 # 快速安装docker
 
 1.在hosts.yml中添加要部署的ssh登录信息/服务器内外网IP地址，比如:

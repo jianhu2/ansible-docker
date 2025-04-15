@@ -24,16 +24,6 @@
     - v2ray
     - nginx
 
-- name: 检查并确保 Nginx 正在运行
-  ansible.builtin.systemd:
-    name: nginx
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
-  register: nginx_status
-  failed_when: nginx_status.failed and "'nginx.service' not found" not in nginx_status.msg
-  changed_when: nginx_status.changed
-
 - name: 检查并确保v2ray服务正常运行
   block:
     - name: 重载systemd配置
@@ -85,3 +75,13 @@
       ansible.builtin.fail:
         msg: "无法启动v2ray服务，请手动检查配置"
       when: final_check is failed
+
+- name: 检查并确保 Nginx 正在运行
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  register: nginx_status
+  failed_when: nginx_status.failed and "'nginx.service' not found" not in nginx_status.msg
+  changed_when: nginx_status.changed
