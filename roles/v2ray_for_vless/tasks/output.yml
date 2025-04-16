@@ -1,0 +1,20 @@
+- name: Generate VLESS link without any whitespace
+  block:
+    - name: Construct VLESS link parts
+      ansible.builtin.set_fact:
+        base_url: "vless://{{ uuid }}@{{ INTERNET_IP }}:{{ v2ray_port }}"
+        query_params: >-
+          type={{ v2ray_network | default('ws') }}&path={{ ws_path }}&host={{ INTERNET_IP }}&security=tls&sni={{ domain }}#{{ connection_name | default('My Default Server') | urlencode }}
+      vars:
+        query_params: "{{ query_params | replace('\n', '') | replace(' ', '') }}"
+
+    - name: Build final VLESS link
+      ansible.builtin.set_fact:
+        vless_final_link: "{{ base_url }}?{{ query_params }}"
+
+    - name: Display clean VLESS link
+      ansible.builtin.debug:
+        msg: |
+          ========== VLESS 完整链接 ==========
+          {{ vless_final_link }}
+          ===================================

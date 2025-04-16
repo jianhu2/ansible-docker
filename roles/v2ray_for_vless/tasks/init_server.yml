@@ -1,0 +1,63 @@
+- name: Generate V2Ray config
+  template:
+    src: "config.json.j2"
+    dest: "/etc/v2ray/config.json"
+
+- name: Generate V2Ray server
+  template:
+    src: "v2ray.service"
+    dest: "/etc/systemd/system/v2ray.service"
+  notify: restart v2ray
+
+- name: 检查并确保v2ray服务正常运行
+  block:
+    - name: 重载systemd配置
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      when: ansible_service_mgr == 'systemd'
+
+    - name: 检查v2ray服务状态
+      ansible.builtin.systemd:
+        name: v2ray
+        enabled: yes
+        state: started
+      register: service_status
+      changed_when: false  # 纯检查任务，不触发changed状态
+
+    - name: 重启v2ray服务
+      ansible.builtin.systemd:
+        name: v2ray
+        state: restarted
+      when:
+        - service_status is succeeded
+        - not service_status.status.ActiveState == 'active'
+
+    - name: 启用开机自启
+      ansible.builtin.systemd:
+        name: v2ray
+        enabled: yes
+      when: service_status is succeeded
+
+  rescue:
+    - name: 记录服务启动失败
+      ansible.builtin.debug:
+        msg: "v2ray服务启动失败，请检查日志：journalctl -u v2ray"
+        level: warning
+
+    - name: 尝试强制重新加载服务
+      ansible.builtin.systemd:
+        name: v2ray
+        state: reloaded
+      ignore_errors: yes
+
+    - name: 最终状态检查
+      ansible.builtin.systemd:
+        name: v2ray
+        state: started
+      register: final_check
+
+    - name: 失败通知
+      ansible.builtin.fail:
+        msg: "无法启动v2ray服务，请手动检查配置"
+      when: final_check is failed
+

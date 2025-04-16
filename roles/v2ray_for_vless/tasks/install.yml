@@ -1,0 +1,37 @@
+- name: 从控制节点传输安装包
+  ansible.builtin.copy:
+    src: "files/v2ray.zip"
+    dest: /tmp/v2ray.zip
+    remote_src: no
+    mode: '0644'
+  when: not (download_remote|default(false)|bool)
+
+- name: 从 GitHub 下载 V2Ray
+  ansible.builtin.get_url:
+    url: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_version }}/v2ray-linux-64.zip"
+    dest: /tmp/v2ray.zip
+    timeout: 120
+    validate_certs: no
+  when: (download_remote|default(true)|bool)
+  retries: 3
+  delay: 10
+
+- name: 确保 unzip 已安装
+  ansible.builtin.package:
+    name: unzip
+    state: present
+  tags: [deps]  # 注意缩进，tags应该与name同级
+
+- name: 创建指定目录
+  ansible.builtin.file:
+    path: /usr/local/bin/v2ray
+    state: directory
+    mode: '0755'
+
+- name: 解压到指定目录
+  ansible.builtin.unarchive:
+    src: /tmp/v2ray.zip
+    dest: /usr/local/bin/v2ray
+    remote_src: yes
+
+

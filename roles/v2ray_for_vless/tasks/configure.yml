@@ -1,0 +1,57 @@
+- name: 检查 geoip.dat 是否存在
+  ansible.builtin.stat:
+    path: /usr/local/bin/geoip.dat
+  register: geoip_file
+
+- name: 检查 geosite.dat 是否存在
+  ansible.builtin.stat:
+    path: /usr/local/bin/geosite.dat
+  register: geosite_file
+
+- name: 下载缺失的文件（条件触发）
+  block:
+    - name: 下载 geoip.dat
+      ansible.builtin.get_url:
+        url: "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat"
+        dest: /usr/local/bin/geoip.dat
+        mode: '0644'
+      when: not geoip_file.stat.exists
+
+    - name: 下载 geosite.dat
+      ansible.builtin.get_url:
+        url: "https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat"
+        dest: /usr/local/bin/geosite.dat
+        mode: '0644'
+      when: not geosite_file.stat.exists
+
+- name: Generate V2Ray config
+  template:
+    src: "config.json.j2"
+    dest: "/etc/v2ray/config.json"
+
+- name: Generate V2Ray server
+  template:
+    src: "v2ray.service"
+    dest: "/etc/systemd/system/v2ray.service"
+  notify: restart v2ray
+
+- name: move TLS crt
+  template:
+    src: "tls.crt"
+    dest: "/etc/v2ray/tls.crt"
+  when: enable_tls
+
+
+- name: move TLS key
+  template:
+    src: "tls.key"
+    dest: "/etc/v2ray/tls.key"
+  when: enable_tls
+
+
+- name: Ensure services are enabled
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  loop:
+    - v2ray
