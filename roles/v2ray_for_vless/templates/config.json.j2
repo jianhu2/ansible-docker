@@ -1,0 +1,46 @@
+{
+  "inbounds": [
+    {
+      "port": {{ v2ray_port }},
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "{{ uuid }}",
+            "flow": ""
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "{{ v2ray_network }}",
+        "security": "tls",
+        "wsSettings": {
+
+          "path": "{{ ws_path }}",
+          "headers": {
+             "Host":  "{{ domain }}"
+          }
+        },
+        "tlsSettings": {
+          "certificates": [
+            {
+              "certificateFile": "/etc/v2ray/tls.crt",
+              "keyFile": "/etc/v2ray/tls.key"
+            }
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    }
+  ]
+}
